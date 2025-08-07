@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Criar um Farm - Ragnarok Online</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <strong>🎯 Farm Manager</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">🏠 Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html">📋 Meus Farms</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="create-farm.html">➕ Criar Farm</a>
+          </li>
+        </ul>
+        <div class="navbar-nav">
+          <button class="btn btn-outline-light btn-sm" onclick="window.farmApp.saveFarm()" id="saveFarmBtn" style="display: none;">
+            💾 Salvar Farm
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container main-container py-4 py-md-5">
+    <div class="text-center mb-4">
+      <h1 class="display-6 fw-bold text-primary">🎯 Criar um Farm</h1>
+      <p class="text-muted">Configure seu farm de Ragnarok Online de forma inteligente</p>
+    </div>
+    
+    <!-- Seção de importação - condicional -->
+    <div id="importSection" style="display: none;">
+      <label for="jsonFileInput" class="form-label fw-bold">📁 Importar banco de dados</label>
+      <input type="file" id="jsonFileInput" accept="application/json" class="form-control mb-3" />
+    </div>
+    
+    <div id="importStatus" class="mb-3"></div>
+    
+    <!-- Status do banco de dados -->
+    <div id="databaseStatus" class="mb-3">
+      <div class="alert alert-secondary d-flex justify-content-between align-items-center">
+        <div></div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="window.farmApp.updateDatabaseStatus()">🔄 Atualizar</button>
+      </div>
+    </div>
+
+    <form id="farmForm">
+      <!-- 1. Definição Inicial -->
+      <section class="mb-4">
+        <h2 class="h4">1. Definição Inicial</h2>
+        <div class="mb-3">
+          <label for="farmName" class="form-label">Nome do Farm</label>
+          <input type="text" id="farmName" name="farmName" class="form-control" placeholder="Ex: Farm de Cartas" />
+        </div>
+        <div class="mb-3">
+          <label for="farmDescription" class="form-label">Descrição (opcional)</label>
+          <textarea id="farmDescription" name="farmDescription" class="form-control" rows="2" placeholder="Descreva seu farm..."></textarea>
+        </div>
+      </section>
+
+      <!-- 2. Coleta Extra (Tipo de Loot Rule) -->
+      <section class="mb-4">
+        <h2 class="h4">2. Coleta Extra</h2>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="lootByPercent" name="lootByPercent" />
+          <label class="form-check-label" for="lootByPercent">🎲 Coletar itens por porcentagem de valor</label>
+        </div>
+        <input type="number" name="lootPercent" class="form-control mb-3" placeholder="Ex: 50" />
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="lootByCategory" name="lootByCategory" />
+          <label class="form-check-label" for="lootByCategory">📦 Coletar itens por categoria</label>
+        </div>
+        <select multiple name="lootCategories" class="form-select mb-3">
+          <option value="weapon">🗡️ Armas</option>
+          <option value="armor">🛡️ Armaduras</option>
+          <option value="accessory">💍 Acessórios</option>
+          <option value="card">🃏 Cartas</option>
+          <option value="consumable">🧪 Consumíveis</option>
+          <option value="material">🔧 Materiais</option>
+        </select>
+      </section>
+
+      <!-- 3. Magias / Atalhos -->
+      <section class="mb-4">
+        <h2 class="h4">3. Magias e Atalhos</h2>
+        
+        <!-- Magia Default -->
+        <div class="mb-4">
+          <h6 class="h6">🌟 Magia Padrão</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Nome da Magia</label>
+              <input type="text" name="defaultSpellName" class="form-control" placeholder="Ex: Fire Bolt" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tecla de Atalho</label>
+              <input type="text" name="defaultSpellKey" class="form-control" placeholder="Ex: F1" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cooldown (ms)</label>
+              <input type="number" name="defaultSpellCooldown" class="form-control" placeholder="Ex: 1000" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Magias Adicionais -->
+        <div class="mb-3">
+          <h6 class="h6">✨ Magias Adicionais</h6>
+          <div id="spellsContainer" class="row g-3"></div>
+          <button type="button" onclick="window.farmApp.addSpell()" class="btn btn-secondary mt-3">+ Adicionar Magia</button>
+        </div>
+      </section>
+
+      <!-- 4. O que deseja coletar? -->
+      <section class="mb-4">
+        <h2 class="h4">4. O que deseja coletar?</h2>
+
+        <div class="mb-3">
+          <label class="form-label">🔎 Buscar por nome ou ID do item</label>
+          <input type="text" name="searchItem" class="form-control" placeholder="Nome ou ID do item" />
+          <div id="itemResults" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">🔍 Buscar por nome ou ID do monstro</label>
+          <input type="text" name="searchMob" class="form-control" placeholder="Nome ou ID do monstro" />
+          <div id="mobResults" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+          <h5 class="h6">Itens adicionados:</h5>
+          <ul id="addedItemsList" class="list-group"></ul>
+        </div>
+      </section>
+
+      <!-- 5. Mapa e Permanência -->
+      <section class="mb-4">
+        <h2 class="h4">5. Mapa e Permanência</h2>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="globalSmartStay" name="globalSmartStay" />
+          <label class="form-check-label" for="globalSmartStay">
+            🧠 Usar permanência inteligente global (baseada na quantidade de mobs)
+          </label>
+        </div>
+        <div id="mapSettings" class="row g-3">
+          <div class="col-12">
+            <p>Nenhum mapa adicionado ainda.</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.farmApp.addMapBlock()">+ Incluir novo mapa</button>
+      </section>
+
+      <!-- 6. NPC de Venda -->
+      <section class="mb-4">
+        <h2 class="h4">6. NPC de Venda</h2>
+        <div class="mb-3">
+          <label class="form-label">Mapa</label>
+          <input type="text" name="npcMap" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Coordenadas</label>
+          <input type="text" name="npcCoords" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Nome do NPC (opcional)</label>
+          <input type="text" name="npcName" class="form-control" />
+        </div>
+      </section>
+
+      <button type="submit" class="btn btn-primary">✅ Gerar JSON</button>
+      <button type="button" class="btn btn-success ms-2" id="saveFarmFormBtn" onclick="window.farmApp.saveFarm()">💾 Salvar Farm</button>
+    </form>
+
+    <pre id="output" class="mt-4 bg-white p-3 border rounded"></pre>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+  <script src="./vendors.bundle.js"></script>
+  <script src="./main.bundle.js"></script>
+</body>
+</html>

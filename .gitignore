@@ -1,0 +1,152 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+db.json
+data.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.cache/
+
+# Docker volumes and data
+volumes/
+docker-data/
+
+# Selenium and browser automation
+screenshots/
+*.png
+*.jpg
+*.jpeg
+*.gif
+selenium-debug.log
+geckodriver.log
+chromedriver.log
+
+# Downloaded files and scraped data
+downloads/
+scraped-data/
+export-data/
+*.csv
+*.xlsx
+*.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Runtime configuration
+.eslintcache
+.stylelintcache
+
+# IDE and editor specific
+*.sublime-project
+*.sublime-workspace
+
+# Webpack
+.webpack/
+
+# Jest
+.jest/
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.fuse_hidden*
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Specific to this project
+scraper/data.json
+scraper/export.json
+scraper/pages/*.html
+ui/coverage/
+ui/dist/

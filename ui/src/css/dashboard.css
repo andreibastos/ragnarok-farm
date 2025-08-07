@@ -1,0 +1,187 @@
+/* Dashboard specific styles */
+
+.farm-card {
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
+}
+
+.farm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #0d6efd;
+}
+
+.farm-card .card-header {
+  background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+  color: white;
+  border-bottom: none;
+}
+
+.farm-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.farm-stat {
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+}
+
+.farm-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.farm-actions .btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.farm-preview {
+  max-height: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.farm-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 30px;
+  width: 100%;
+  background: linear-gradient(transparent, white);
+}
+
+.badge-custom {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+}
+
+.search-highlight {
+  background-color: yellow;
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+.empty-state i {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+/* Import/Export animations */
+.importing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.import-success {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .farm-stats {
+    justify-content: center;
+  }
+  
+  .farm-actions {
+    justify-content: center;
+  }
+  
+  .farm-actions .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Sortable indicators */
+.sort-indicator {
+  margin-left: 0.5rem;
+  opacity: 0.5;
+}
+
+.sort-indicator.active {
+  opacity: 1;
+}
+
+/* Farm type badges */
+.farm-type-manual {
+  background: #198754;
+}
+
+.farm-type-imported {
+  background: #0dcaf0;
+}
+
+.farm-type-template {
+  background: #ffc107;
+  color: #000;
+}
+
+/* Stats colors */
+.stat-maps {
+  color: #0d6efd;
+  border-color: #0d6efd;
+  background: rgba(13, 110, 253, 0.1);
+}
+
+.stat-items {
+  color: #198754;
+  border-color: #198754;
+  background: rgba(25, 135, 84, 0.1);
+}
+
+.stat-spells {
+  color: #6f42c1;
+  border-color: #6f42c1;
+  background: rgba(111, 66, 193, 0.1);
+}
+
+.stat-date {
+  color: #6c757d;
+  border-color: #6c757d;
+  background: rgba(108, 117, 125, 0.1);
+}
