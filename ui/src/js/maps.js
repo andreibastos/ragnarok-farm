@@ -56,12 +56,16 @@ export class MapManager {
           <div class="mb-2">
             <label class="form-label small">🎯 Itens específicos para este mapa</label>
             <div class="border rounded p-2 bg-light" style="min-height: 60px;">
-              <div class="d-flex gap-2 mb-2">
-                <input type="text" class="form-control form-control-sm" 
-                       placeholder="Nome ou ID do item" 
-                       onkeypress="if(event.key==='Enter'){window.farmApp.addItemToMap(this, event)}" />
+              <div class="d-flex gap-2 mb-2 position-relative">
+                <div class="flex-grow-1 position-relative">
+                  <input type="text" class="form-control form-control-sm map-item-search" 
+                         placeholder="Nome ou ID do item" 
+                         onkeypress="if(event.key==='Enter'){window.farmApp.addItemToMap(this, event)}" />
+                  <div class="map-item-results position-absolute w-100 bg-white border rounded shadow-sm" 
+                       style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                </div>
                 <button type="button" class="btn btn-sm btn-outline-primary" 
-                        onclick="window.farmApp.addItemToMap(this.previousElementSibling)">
+                        onclick="window.farmApp.addItemToMap(this.previousElementSibling.querySelector('input'))">
                   ➕
                 </button>
               </div>
@@ -157,12 +161,16 @@ export class MapManager {
             <div class="mb-2">
               <label class="form-label small">🎯 Itens específicos para este mapa</label>
               <div class="border rounded p-2 bg-light" style="min-height: 60px;">
-                <div class="d-flex gap-2 mb-2">
-                  <input type="text" class="form-control form-control-sm" 
-                         placeholder="Nome ou ID do item" 
-                         onkeypress="if(event.key==='Enter'){window.farmApp.addItemToMap(this, event)}" />
+                <div class="d-flex gap-2 mb-2 position-relative">
+                  <div class="flex-grow-1 position-relative">
+                    <input type="text" class="form-control form-control-sm map-item-search" 
+                           placeholder="Nome ou ID do item" 
+                           onkeypress="if(event.key==='Enter'){window.farmApp.addItemToMap(this, event)}" />
+                    <div class="map-item-results position-absolute w-100 bg-white border rounded shadow-sm" 
+                         style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                  </div>
                   <button type="button" class="btn btn-sm btn-outline-primary" 
-                          onclick="window.farmApp.addItemToMap(this.previousElementSibling)">
+                          onclick="window.farmApp.addItemToMap(this.previousElementSibling.querySelector('input'))">
                     ➕
                   </button>
                 </div>

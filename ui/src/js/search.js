@@ -74,6 +74,132 @@ export class SearchManager {
     this.showMobDetailsCallback = showDetailsCallback;
   }
 
+  setupMapItemSearch(inputElement, resultsContainer, mapName) {
+    if (!inputElement || !resultsContainer) {
+      console.error('Elementos de busca de item do mapa não encontrados!');
+      return;
+    }
+    
+    inputElement.addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 2) {
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      try {
+        const { results, totalItems } = await this.db.searchItems(query);
+        
+        if (totalItems === 0) {
+          resultsContainer.innerHTML = '<div class="alert alert-warning small">⚠️ Nenhum item encontrado</div>';
+          resultsContainer.style.display = 'block';
+          return;
+        }
+
+        // Mostrar até 5 resultados
+        const limitedResults = results.slice(0, 5);
+        this.displayMapItemResults(limitedResults, resultsContainer, inputElement, mapName);
+        resultsContainer.style.display = 'block';
+      } catch (err) {
+        console.error('Erro na busca por itens do mapa:', err);
+        resultsContainer.innerHTML = '<div class="alert alert-danger small">❌ Erro ao buscar itens</div>';
+        resultsContainer.style.display = 'block';
+      }
+    });
+
+    // Navegação por teclado
+    inputElement.addEventListener('keydown', (e) => {
+      const visibleResults = resultsContainer.querySelectorAll('.map-item-result:not([style*="display: none"])');
+      const currentSelected = resultsContainer.querySelector('.map-item-result.selected');
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!currentSelected && visibleResults.length > 0) {
+          visibleResults[0].classList.add('selected');
+        } else if (currentSelected) {
+          const currentIndex = Array.from(visibleResults).indexOf(currentSelected);
+          currentSelected.classList.remove('selected');
+          if (currentIndex < visibleResults.length - 1) {
+            visibleResults[currentIndex + 1].classList.add('selected');
+          } else {
+            visibleResults[0].classList.add('selected');
+          }
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!currentSelected && visibleResults.length > 0) {
+          visibleResults[visibleResults.length - 1].classList.add('selected');
+        } else if (currentSelected) {
+          const currentIndex = Array.from(visibleResults).indexOf(currentSelected);
+          currentSelected.classList.remove('selected');
+          if (currentIndex > 0) {
+            visibleResults[currentIndex - 1].classList.add('selected');
+          } else {
+            visibleResults[visibleResults.length - 1].classList.add('selected');
+          }
+        }
+      } else if (e.key === 'Enter' && currentSelected) {
+        e.preventDefault();
+        currentSelected.click();
+      } else if (e.key === 'Escape') {
+        resultsContainer.style.display = 'none';
+      }
+    });
+
+    // Esconder resultados quando clicar fora
+    document.addEventListener('click', (e) => {
+      if (!inputElement.contains(e.target) && !resultsContainer.contains(e.target)) {
+        resultsContainer.style.display = 'none';
+      }
+    });
+  }
+
+  displayMapItemResults(items, container, inputElement, mapName) {
+    container.innerHTML = '';
+    
+    items.forEach(item => {
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'map-item-result border-bottom p-2 cursor-pointer';
+      resultDiv.style.cursor = 'pointer';
+      
+      const itemImageUrl = SearchManager.generateItemImageUrl(item);
+      
+      resultDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <img src="${itemImageUrl}" 
+               class="me-2" width="20" height="20" alt="${item.name}" 
+               onerror="this.src='${SearchManager.getDefaultItemImage()}'" />
+          <div>
+            <small class="fw-medium">${item.name}</small>
+            <br><small class="text-muted">🔢 ID: ${item.id}</small>
+            ${item.name && item.name.toLowerCase().includes('card') ? '<br><small class="text-info">🃏 Carta</small>' : ''}
+          </div>
+        </div>
+      `;
+      
+      // Hover effect
+      resultDiv.addEventListener('mouseenter', () => {
+        // Remove seleção de outros itens
+        container.querySelectorAll('.map-item-result').forEach(r => r.classList.remove('selected'));
+        resultDiv.classList.add('selected');
+      });
+      
+      resultDiv.addEventListener('mouseleave', () => {
+        resultDiv.classList.remove('selected');
+      });
+      
+      resultDiv.addEventListener('click', () => {
+        inputElement.value = item.name;
+        container.style.display = 'none';
+        // Adicionar automaticamente o item ao mapa
+        window.farmApp.addItemToMap(inputElement);
+      });
+      
+      container.appendChild(resultDiv);
+    });
+  }
+
   async getItemMapData(item) {
     try {
       const drops = await this.db.getMobDrops(item.id);

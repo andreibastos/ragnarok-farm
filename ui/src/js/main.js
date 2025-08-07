@@ -272,6 +272,22 @@ class FarmApp {
       (mapName) => this.removeSelectedMap(mapName),
       () => this.updateMapSpellOptions()
     );
+    
+    // Configurar autocomplete para cada campo de busca de item específico do mapa
+    this.setupMapItemSearches();
+  }
+
+  // Configurar autocomplete para cada campo de busca de item específico do mapa
+  setupMapItemSearches() {
+    const mapItemSearchInputs = document.querySelectorAll('.map-item-search');
+    mapItemSearchInputs.forEach(input => {
+      const resultsContainer = input.parentElement.querySelector('.map-item-results');
+      const mapNameInput = input.closest('.card-body').querySelector('input[name="mapName[]"]');
+      const mapName = mapNameInput ? mapNameInput.value : 'Mapa';
+      
+      // Configurar autocomplete para este campo
+      this.search.setupMapItemSearch(input, resultsContainer, mapName);
+    });
   }
 
   updateItemQuantity(itemId, quantity) {
@@ -309,6 +325,10 @@ class FarmApp {
 
   addMapBlock() {
     this.maps.addMapBlock(() => this.updateMapSpellOptions());
+    // Configurar autocomplete nos novos campos criados
+    setTimeout(() => {
+      this.setupMapItemSearches();
+    }, 100);
   }
 
   async showMapMobs(buttonElement) {
@@ -327,8 +347,8 @@ class FarmApp {
     this.modals.closeMapMobsModal();
   }
 
-  async showMobDrops(mobId, mobName) {
-    await this.modals.showMobDrops(mobId, mobName);
+  async showMobDrops(mobId, mobName, mapName = null) {
+    await this.modals.showMobDrops(mobId, mobName, mapName);
   }
 
   closeMobDropsModal() {
@@ -565,6 +585,72 @@ class FarmApp {
     
     // Atualizar interface
     this.renderMapItems(itemsList, filteredItems);
+  }
+
+  // Método para selecionar item de drop de monstro
+  selectDropItem(itemId, itemName, mobName, specificMapName = null) {
+    // 1. Adicionar à lista geral de itens selecionados
+    this.selectedItems.add({ id: itemId, name: itemName, quantity: 1 });
+    
+    // 2. Determinar quais mapas devem receber o item
+    let mapsToAddItem = [];
+    
+    if (specificMapName) {
+      // Se um mapa específico foi fornecido, adicionar apenas a ele
+      mapsToAddItem = [...this.selectedMapsWithMobs].filter(mapInfo => 
+        mapInfo.map === specificMapName
+      );
+    } else {
+      // Caso contrário, encontrar todos os mapas que contêm este monstro
+      mapsToAddItem = [...this.selectedMapsWithMobs].filter(mapInfo => 
+        mapInfo.mobName === mobName
+      );
+    }
+    
+    // 3. Adicionar o item aos mapas identificados
+    mapsToAddItem.forEach(mapInfo => {
+      this.addItemToMap(mapInfo.map, itemId, itemName);
+    });
+    
+    // 4. Atualizar as visualizações
+    this.renderAddedItems();
+    
+    // 5. Mostrar feedback visual
+    let alertMessage;
+    if (specificMapName && mapsToAddItem.length > 0) {
+      alertMessage = `Item "${itemName}" adicionado à lista geral e ao mapa "${specificMapName}"`;
+    } else if (mapsToAddItem.length > 0) {
+      alertMessage = `Item "${itemName}" adicionado à lista geral e aos ${mapsToAddItem.length} mapa(s) que contêm "${mobName}"`;
+    } else {
+      alertMessage = `Item "${itemName}" adicionado à lista geral`;
+    }
+    
+    // Criar notificação temporária
+    this.showTemporaryAlert(alertMessage, 'success');
+  }
+
+  // Método para mostrar alerta temporário
+  showTemporaryAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '2000';
+    alertDiv.style.maxWidth = '400px';
+    
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove após 4 segundos
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.remove();
+      }
+    }, 4000);
   }
 }
 

@@ -23,6 +23,20 @@
   background-color: #f8f9fa;
 }
 
+/* Map item search autocomplete */
+.map-item-result {
+  transition: background-color 0.2s ease;
+}
+
+.map-item-result:hover,
+.map-item-result.selected {
+  background-color: #e3f2fd !important;
+}
+
+.map-item-results {
+  border-top: none !important;
+}
+
 .btn-group-responsive {
   display: flex;
   gap: 0.5rem;

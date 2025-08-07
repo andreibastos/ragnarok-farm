@@ -112,7 +112,7 @@ export class ModalManager {
       ` : '';
       
       mobsHtml += `
-        <div class="d-flex align-items-center p-2 border-bottom cursor-pointer" onclick="window.farmApp.showMobDrops(${mobInfo.mob.id}, '${mobInfo.mob.name}')" style="cursor: pointer;">
+        <div class="d-flex align-items-center p-2 border-bottom cursor-pointer" onclick="window.farmApp.showMobDrops(${mobInfo.mob.id}, '${mobInfo.mob.name}', '${mapName}')" style="cursor: pointer;">
           <img src="${mobImageUrls[0]}" 
                class="me-3 mob-image" width="32" height="32" alt="${mobInfo.mob.name}"
                data-mob-id="${mobInfo.mob.id}"
@@ -185,7 +185,7 @@ export class ModalManager {
     }
   }
 
-  async showMobDrops(mobId, mobName) {
+  async showMobDrops(mobId, mobName, mapName = null) {
     try {
       const drops = await this.db.getItemDrops(mobId);
       
@@ -210,7 +210,7 @@ export class ModalManager {
         };
       }).sort((a, b) => a.item.name.localeCompare(b.item.name));
       
-      this.showMobDropsModal(mobName, dropsList);
+      this.showMobDropsModal(mobName, dropsList, mapName);
       
     } catch (err) {
       console.error('Erro ao buscar drops do monstro:', err);
@@ -218,7 +218,7 @@ export class ModalManager {
     }
   }
 
-  showMobDropsModal(mobName, dropsList) {
+  showMobDropsModal(mobName, dropsList, mapName = null) {
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'modal-overlay';
     modalOverlay.style.zIndex = '1060';
@@ -241,19 +241,28 @@ export class ModalManager {
             <br><small class="text-muted">🔢 ID: ${dropInfo.item.id}</small>
             ${dropInfo.item.name && dropInfo.item.name.toLowerCase().includes('card') ? '<br><small class="text-info">🃏 Carta</small>' : ''}
           </div>
+          <button class="btn btn-sm btn-outline-success" 
+                  onclick="event.stopPropagation(); window.farmApp.selectDropItem(${dropInfo.item.id}, '${dropInfo.item.name.replace(/'/g, "\\'")}', '${mobName}', '${mapName || ''}')">
+            ➕ Adicionar
+          </button>
         </div>
       `;
     });
     
+    const mapInfo = mapName ? ` (Mapa: ${mapName})` : '';
+    const descriptionText = mapName 
+      ? `Encontrados ${dropsList.length} itens que este monstro pode dropar. Clique em "➕ Adicionar" para incluir o item na sua lista e no mapa "${mapName}":`
+      : `Encontrados ${dropsList.length} itens que este monstro pode dropar. Clique em "➕ Adicionar" para incluir o item na sua lista e nos mapas associados:`;
+    
     modalContent.innerHTML = `
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0"> Drops de: ${mobName}</h5>
+        <h5 class="mb-0">🎁 Drops de: ${mobName}${mapInfo}</h5>
         <button class="btn btn-sm btn-outline-secondary" onclick="window.farmApp.closeMobDropsModal()">
           ❌ Fechar
         </button>
       </div>
       <div class="mb-3">
-        <small class="text-muted">Encontrados ${dropsList.length} itens que este monstro pode dropar:</small>
+        <small class="text-muted">${descriptionText}</small>
       </div>
       <div style="max-height: 400px; overflow-y: auto;">
         ${dropsHtml}
