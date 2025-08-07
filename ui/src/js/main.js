@@ -206,14 +206,15 @@ class FarmApp {
       });
     });
     
-    // Adicionar o item automaticamente aos mapas já existentes
+    this.renderAddedItems();
+    this.renderSelectedMaps();
+    
+    // Adicionar o item automaticamente aos mapas após renderizar
     const existingMaps = [...this.selectedMapsWithMobs];
     existingMaps.forEach(mapInfo => {
       this.addItemToMap(mapInfo.map, itemId, itemName);
     });
     
-    this.renderAddedItems();
-    this.renderSelectedMaps();
     this.clearItemSearch();
   }
 
@@ -526,15 +527,23 @@ class FarmApp {
       return;
     }
 
-    const itemsHtml = items.map(item => `
-      <div class="d-flex justify-content-between align-items-center mb-1">
-        <small class="text-primary">🎁 ${item.name}</small>
-        <button type="button" class="btn btn-sm btn-outline-danger" 
-                onclick="window.farmApp.removeItemFromMap(this, '${item.id}')">
-          ❌
-        </button>
-      </div>
-    `).join('');
+    const itemsHtml = items.map(item => {
+      const itemImageUrl = SearchManager.generateItemImageUrl(item);
+      return `
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <div class="d-flex align-items-center">
+            <img src="${itemImageUrl}" 
+                 width="20" height="20" class="me-2" alt="${item.name}"
+                 onerror="this.src='${SearchManager.getDefaultItemImage()}'" />
+            <small class="text-primary">${item.name}</small>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" 
+                  onclick="window.farmApp.removeItemFromMap(this, '${item.id}')">
+            ❌
+          </button>
+        </div>
+      `;
+    }).join('');
 
     container.innerHTML = itemsHtml;
   }
@@ -545,9 +554,12 @@ class FarmApp {
     const itemsList = mapCard.querySelector('.map-items-list');
     const hiddenInput = mapCard.querySelector('input[name="mapItems[]"]');
     
-    // Atualizar dados
+    // Atualizar dados - converter para comparação adequada
     const existingItems = JSON.parse(hiddenInput.value || '[]');
-    const filteredItems = existingItems.filter(item => item.id !== itemId);
+    const filteredItems = existingItems.filter(item => {
+      // Comparar tanto como string quanto como número para garantir compatibilidade
+      return item.id != itemId && item.id !== parseInt(itemId) && item.id !== itemId.toString();
+    });
     
     hiddenInput.value = JSON.stringify(filteredItems);
     

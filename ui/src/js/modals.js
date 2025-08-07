@@ -247,7 +247,7 @@ export class ModalManager {
     
     modalContent.innerHTML = `
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">🎁 Drops de: ${mobName}</h5>
+        <h5 class="mb-0"> Drops de: ${mobName}</h5>
         <button class="btn btn-sm btn-outline-secondary" onclick="window.farmApp.closeMobDropsModal()">
           ❌ Fechar
         </button>

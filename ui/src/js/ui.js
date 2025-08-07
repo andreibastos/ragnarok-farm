@@ -117,7 +117,7 @@ export class UIManager {
         
         <div style="max-height: 300px; overflow-y: auto;">
           <div class="mb-3">
-            <h6 class="h6">🎁 Drops:</h6>
+            <h6 class="h6">Drops:</h6>
             <div id="mobDropsList"></div>
           </div>
           
