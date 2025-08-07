@@ -80,7 +80,11 @@ export class FormManager {
   }
 
   collectFormData(formData, selectedItems, selectedMaps, selectedMapsWithMobs) {
+    
     return {
+      // Versão do formato para compatibilidade
+      version: '2.0',
+      
       // Definição inicial
       name: formData.get('farmName') || 'Farm sem nome',
       description: formData.get('farmDescription') || '',
@@ -184,7 +188,7 @@ export class FormManager {
         const mapConfig = {
           name: mapNames[i].trim(),
           stayValue: parseInt(mapStayValues[i]) || 1,
-          spell: mapSpells[i] === 'default' ? null : mapSpells[i],
+          spell: mapSpells[i] === 'default' ? 'default' : mapSpells[i],
           source: 'manual'
         };
         
@@ -217,7 +221,7 @@ export class FormManager {
         maps.push({
           name: mapInfo.map,
           stayValue: parseInt(mapInfo.mobCount) || 1,
-          spell: null, // Será definido pela configuração global
+          spell: "default", // Usar magia padrão
           source: mapInfo.source,
           targetMob: mapInfo.mobName,
           mobId: mapInfo.mobId,
