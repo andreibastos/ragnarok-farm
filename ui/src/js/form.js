@@ -115,12 +115,39 @@ export class FormManager {
       globalSmartStay: formData.get('globalSmartStay') === 'on',
       
       // NPC de venda
-      npc: {
-        map: formData.get('npcMap') || '',
-        coords: formData.get('npcCoords') || '',
-        name: formData.get('npcName') || ''
-      }
+      npc: this.parseNpcWarp(formData.get('npcWarp') || '')
     };
+  }
+
+  parseNpcWarp(warpString) {
+    const trimmed = warpString.trim();
+    if (!trimmed) {
+      return { map: '', coords: '', name: '' };
+    }
+
+    // Dividir por espaços: "prontera 35 66" -> ["prontera", "35", "66"]
+    const parts = trimmed.split(/\s+/);
+    
+    if (parts.length >= 3) {
+      const map = parts[0];
+      const x = parts[1];
+      const y = parts[2];
+      return {
+        map: map,
+        coords: `${x} ${y}`,
+        name: '' // Nome vazio por padrão
+      };
+    } else if (parts.length === 1) {
+      // Se só tem um valor, assumir que é só o mapa
+      return {
+        map: parts[0],
+        coords: '',
+        name: ''
+      };
+    } else {
+      // Formato inválido
+      return { map: '', coords: '', name: '' };
+    }
   }
 
   collectAdditionalSpells(formData) {

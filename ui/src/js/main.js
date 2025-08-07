@@ -99,9 +99,11 @@ class FarmApp {
     
     // Carregar NPC
     if (farm.npc) {
-      document.querySelector('input[name="npcMap"]').value = farm.npc.map || '';
-      document.querySelector('input[name="npcCoords"]').value = farm.npc.coords || '';
-      document.querySelector('input[name="npcName"]').value = farm.npc.name || '';
+      const warpValue = this.formatNpcWarp(farm.npc);
+      const npcWarpInput = document.querySelector('input[name="npcWarp"]');
+      if (npcWarpInput) {
+        npcWarpInput.value = warpValue;
+      }
     }
     
     // Carregar itens
@@ -126,6 +128,16 @@ class FarmApp {
     this.renderAddedItems();
     this.renderSelectedMaps();
     this.updateMapSpellOptions();
+  }
+
+  formatNpcWarp(npc) {
+    if (!npc.map) return '';
+    
+    if (npc.coords) {
+      return `${npc.map} ${npc.coords}`;
+    } else {
+      return npc.map;
+    }
   }
 
   showSaveButton() {
