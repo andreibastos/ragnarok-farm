@@ -4,7 +4,7 @@ export class FarmStorage {
     this.storageKey = 'ragnarok_farms';
   }
 
-  async getAllFarms() {
+  getAllFarms() {
     try {
       const stored = localStorage.getItem(this.storageKey);
       return stored ? JSON.parse(stored) : [];
@@ -16,13 +16,13 @@ export class FarmStorage {
 
   async saveFarm(farmData) {
     try {
-      const farms = await this.getAllFarms();
-      
+      const farms = this.getAllFarms();
+
       // Verificar se já existe (atualizar) ou adicionar novo
       const existingIndex = farms.findIndex(f => f.id === farmData.id);
-      
+
       let farmToSave = { ...farmData };
-      
+
       if (existingIndex >= 0) {
         // Atualizar farm existente - preservar createdAt original
         const existingFarm = farms[existingIndex];
@@ -38,7 +38,7 @@ export class FarmStorage {
         farmToSave.updatedAt = new Date().toISOString();
         farms.push(farmToSave);
       }
-      
+
       localStorage.setItem(this.storageKey, JSON.stringify(farms));
       return farmToSave;
     } catch (error) {
@@ -47,9 +47,9 @@ export class FarmStorage {
     }
   }
 
-  async getFarm(farmId) {
+  getFarm(farmId) {
     try {
-      const farms = await this.getAllFarms();
+      const farms = this.getAllFarms();
       const found = farms.find(f => f.id === farmId);
       return found === undefined ? null : found;
     } catch (error) {
@@ -83,7 +83,7 @@ export class FarmStorage {
   async importFarms(farmsData) {
     try {
       const existingFarms = await this.getAllFarms();
-      
+
       if (!Array.isArray(farmsData)) {
         throw new Error('Dados devem ser um array de farms');
       }
@@ -97,13 +97,13 @@ export class FarmStorage {
         }
         farm.updatedAt = new Date().toISOString();
         farm.imported = true;
-        
+
         return farm;
       });
-      
+
       // Combinar com farms existentes (evitar duplicatas por nome)
       const combinedFarms = [...existingFarms];
-      
+
       processedFarms.forEach(newFarm => {
         const existingIndex = combinedFarms.findIndex(f => f.name === newFarm.name);
         if (existingIndex >= 0) {
@@ -112,7 +112,7 @@ export class FarmStorage {
         }
         combinedFarms.push(newFarm);
       });
-      
+
       localStorage.setItem(this.storageKey, JSON.stringify(combinedFarms));
       return processedFarms.length;
     } catch (error) {
@@ -128,12 +128,12 @@ export class FarmStorage {
   getUniqueName(baseName, existingFarms) {
     let counter = 1;
     let newName = `${baseName} (${counter})`;
-    
+
     while (existingFarms.some(f => f.name === newName)) {
       counter++;
       newName = `${baseName} (${counter})`;
     }
-    
+
     return newName;
   }
 
@@ -142,14 +142,14 @@ export class FarmStorage {
     try {
       const dataStr = JSON.stringify(farms, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
+
       const link = document.createElement('a');
       link.href = URL.createObjectURL(dataBlob);
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       return true;
     } catch (error) {
       console.error('Erro ao exportar para arquivo:', error);
@@ -160,7 +160,7 @@ export class FarmStorage {
   async importFromFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
@@ -169,11 +169,11 @@ export class FarmStorage {
           reject(new Error('Arquivo JSON inválido'));
         }
       };
-      
+
       reader.onerror = () => {
         reject(new Error('Erro ao ler arquivo'));
       };
-      
+
       reader.readAsText(file);
     });
   }
@@ -183,7 +183,7 @@ export class FarmStorage {
     try {
       const farms = await this.getAllFarms();
       const dataSize = localStorage.getItem(this.storageKey)?.length || 0;
-      
+
       return {
         totalFarms: farms.length,
         totalMaps: farms.reduce((sum, farm) => sum + (Array.isArray(farm.selectedMaps) ? farm.selectedMaps.length : 0), 0),

@@ -55,6 +55,68 @@ export class FarmRenderer {
     });
   }
 
+  // Renderiza um card individual de farm como HTML string
+  renderFarmCard(farm) {
+    try {
+      const items = Array.isArray(farm.items) ? farm.items : [];
+      const maps = Array.isArray(farm.maps) ? farm.maps : [];
+      const itemCount = items.length;
+      const mapCount = maps.length;
+      const itemLabel = itemCount === 1 ? 'item' : 'itens';
+      const mapLabel = mapCount === 1 ? 'mapa' : 'mapas';
+      const createdAt = this.formatDate(farm.createdAt);
+
+      return `
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">${this.escapeHtml(farm.name)}</h5>
+              <p class="card-text">${this.escapeHtml(farm.description || '')}</p>
+              <p class="card-text">
+                <span class="badge bg-primary">${mapCount} ${mapLabel}</span>
+                <span class="badge bg-secondary ms-1">${itemCount} ${itemLabel}</span>
+              </p>
+              <p class="card-text">
+                <small class="text-muted">Criado em: ${createdAt}</small>
+              </p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-group w-100" role="group">
+                <button class="btn btn-outline-primary btn-sm btn-view-farm" data-farm-id="${farm.id}">
+                  👁️ Ver
+                </button>
+                <button class="btn btn-outline-secondary btn-sm btn-edit-farm" data-farm-id="${farm.id}">
+                  ✏️ Editar
+                </button>
+                <button class="btn btn-outline-info btn-sm btn-duplicate-farm" data-farm-id="${farm.id}">
+                  📋 Duplicar
+                </button>
+                <button class="btn btn-outline-success btn-sm btn-export-farm" data-farm-id="${farm.id}">
+                  💾 Exportar
+                </button>
+                <button class="btn btn-outline-danger btn-sm btn-delete-farm" data-farm-id="${farm.id}">
+                  🗑️ Deletar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error rendering farm card:', error);
+      return `
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">${this.escapeHtml(farm.name || 'Farm sem nome')}</h5>
+              <p class="card-text text-danger">Erro ao renderizar farm</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Renderiza detalhes do farm no elemento #farmDetailModalBody
   renderFarmDetail(farm) {
     const modalBody = document.getElementById('farmDetailModalBody');
@@ -84,6 +146,65 @@ export class FarmRenderer {
       html += '<div>Nenhum mob selecionado</div>';
     }
     modalBody.innerHTML = html;
+  }
+
+  // Renderiza detalhes completos do farm como HTML string
+  renderFarmDetails(farm) {
+    let html = '';
+    
+    html += `<div class="farm-details">`;
+    html += `<h4>${this.escapeHtml(farm.name)}</h4>`;
+    
+    if (farm.description) {
+      html += `<p class="lead">${this.escapeHtml(farm.description)}</p>`;
+    }
+    
+    html += `<div class="row">`;
+    
+    // Informações gerais
+    html += `<div class="col-md-6">`;
+    html += `<h6>📊 Informações Gerais</h6>`;
+    html += `<ul class="list-unstyled">`;
+    html += `<li><strong>Criado em:</strong> ${this.formatDate(farm.createdAt)}</li>`;
+    html += `<li><strong>Atualizado em:</strong> ${this.formatDate(farm.updatedAt)}</li>`;
+    html += `</ul>`;
+    html += `</div>`;
+    
+    // Mapas
+    html += `<div class="col-md-6">`;
+    html += `<h6>🗺️ Mapas (${farm.maps ? farm.maps.length : 0})</h6>`;
+    if (farm.maps && farm.maps.length > 0) {
+      html += `<ul class="list-unstyled">`;
+      farm.maps.forEach(map => {
+        html += `<li>• ${this.escapeHtml(map.name || map)}</li>`;
+      });
+      html += `</ul>`;
+    } else {
+      html += `<p class="text-muted">Nenhum mapa configurado</p>`;
+    }
+    html += `</div>`;
+    
+    html += `</div>`;
+    
+    // Itens
+    html += `<div class="mt-3">`;
+    html += `<h6>🎁 Itens (${farm.items ? farm.items.length : 0})</h6>`;
+    if (farm.items && farm.items.length > 0) {
+      html += `<div class="row">`;
+      farm.items.forEach(item => {
+        html += `<div class="col-md-4 mb-2">`;
+        html += `<span class="badge bg-secondary">${item.icon || '📦'} ${this.escapeHtml(item.name || item)}</span>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<p class="text-muted">Nenhum item configurado</p>`;
+    }
+    html += `</div>`;
+    
+    html += `</div>`;
+    
+    return html;
   }
 
   // Formata datas para dd/mm/yyyy hh:mm

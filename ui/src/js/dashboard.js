@@ -8,16 +8,16 @@ class FarmDashboard {
     this.storage = new FarmStorage();
     this.renderer = new FarmRenderer();
     this.manager = new FarmManager(this.storage, this.renderer);
-    
+
     this.farms = [];
     this.filteredFarms = [];
-    
+
     this.init();
   }
 
-  async init() {
+  init() {
     try {
-      await this.loadFarms();
+      this.loadFarms();
       this.setupEventListeners();
       this.renderFarms();
       this.updateFarmsCount();
@@ -26,8 +26,8 @@ class FarmDashboard {
     }
   }
 
-  async loadFarms() {
-    this.farms = await this.storage.getAllFarms();
+  loadFarms() {
+    this.farms = this.storage.getAllFarms();
     this.filteredFarms = [...this.farms];
   }
 
@@ -59,18 +59,18 @@ class FarmDashboard {
 
   filterFarms(searchTerm) {
     const term = searchTerm.toLowerCase().trim();
-    
+
     if (!term) {
       this.filteredFarms = [...this.farms];
     } else {
-      this.filteredFarms = this.farms.filter(farm => 
+      this.filteredFarms = this.farms.filter(farm =>
         farm.name.toLowerCase().includes(term) ||
         farm.description.toLowerCase().includes(term) ||
         farm.maps.some(map => map.name.toLowerCase().includes(term)) ||
         farm.items.some(item => item.name.toLowerCase().includes(term))
       );
     }
-    
+
     this.renderFarms();
   }
 
@@ -89,25 +89,27 @@ class FarmDashboard {
         this.filteredFarms.sort((a, b) => b.items.length - a.items.length);
         break;
     }
-    
+
     this.renderFarms();
   }
 
   renderFarms() {
     const farmsList = document.getElementById('farmsList');
     const noFarmsMessage = document.getElementById('noFarmsMessage');
-    
+
     if (this.filteredFarms.length === 0) {
-      farmsList.innerHTML = '';
-      noFarmsMessage.style.display = 'block';
+      if (farmsList) farmsList.innerHTML = '';
+      if (noFarmsMessage) noFarmsMessage.style.display = 'block';
     } else {
-      noFarmsMessage.style.display = 'none';
-      farmsList.innerHTML = this.filteredFarms.map(farm => 
-        this.renderer.renderFarmCard(farm)
-      ).join('');
-      
-      // Adicionar event listeners aos botões
-      this.attachCardEventListeners();
+      if (noFarmsMessage) noFarmsMessage.style.display = 'none';
+      if (farmsList) {
+        farmsList.innerHTML = this.filteredFarms.map(farm =>
+          this.renderer.renderFarmCard(farm)
+        ).join('');
+
+        // Adicionar event listeners aos botões
+        this.attachCardEventListeners();
+      }
     }
   }
 
@@ -292,23 +294,23 @@ class FarmDashboard {
   showFarmDetails(farm) {
     const modal = new bootstrap.Modal(document.getElementById('farmDetailsModal'));
     const content = document.getElementById('farmDetailsContent');
-    
+
     content.innerHTML = this.renderer.renderFarmDetails(farm);
-    
+
     // Configurar botão de editar
     document.getElementById('editFarmBtn').onclick = () => {
       modal.hide();
       this.editFarm(farm.id);
     };
-    
+
     modal.show();
   }
 
   showImportStatus(type, message) {
     const statusDiv = document.getElementById('importStatus');
-    const alertClass = type === 'success' ? 'alert-success' : 
-                     type === 'warning' ? 'alert-warning' : 'alert-danger';
-    
+    const alertClass = type === 'success' ? 'alert-success' :
+      type === 'warning' ? 'alert-warning' : 'alert-danger';
+
     statusDiv.innerHTML = `
       <div class="alert ${alertClass} alert-dismissible fade show">
         ${message}
@@ -328,18 +330,18 @@ class FarmDashboard {
   showConfirmDialog(title, message) {
     return new Promise((resolve) => {
       const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-      
+
       document.querySelector('#confirmModal .modal-title').textContent = title;
       document.getElementById('confirmMessage').textContent = message;
-      
+
       const confirmBtn = document.getElementById('confirmAction');
       confirmBtn.onclick = () => {
         modal.hide();
         resolve(true);
       };
-      
+
       modal.show();
-      
+
       // Resolver como false se o modal for fechado sem confirmar
       document.getElementById('confirmModal').addEventListener('hidden.bs.modal', () => {
         resolve(false);
@@ -348,9 +350,5 @@ class FarmDashboard {
   }
 }
 
-// Inicializar dashboard quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-  window.farmDashboard = new FarmDashboard();
-});
 
 export { FarmDashboard };
